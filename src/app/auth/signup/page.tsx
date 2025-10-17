@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { SocialLoginGroup } from '@/components/social-login'
 
 export default function SignUpPage() {
   const [name, setName] = useState('')
@@ -74,6 +75,25 @@ export default function SignUpPage() {
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {/* Social Login Options */}
+          <div>
+            <div className="mb-6">
+              <SocialLoginGroup />
+            </div>
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">
+                  Or create account with email
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Registration Form */}
           <div className="rounded-md shadow-sm space-y-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
