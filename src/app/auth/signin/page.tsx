@@ -64,6 +64,9 @@ export default function SignInPage() {
           <div>
             <div className="mb-6">
               <SocialLoginGroup />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+                Social login requires OAuth configuration
+              </p>
             </div>
             
             <div className="relative">

@@ -68,9 +68,15 @@ export function SocialLoginButton({ provider, isLoading, onLoading }: SocialLogi
     onLoading?.(true)
     
     try {
-      await signIn(provider, { callbackUrl: '/' })
+      const result = await signIn(provider, { callbackUrl: '/' })
+      if (result?.error) {
+        console.error(`Error signing in with ${provider}:`, result.error)
+        // You could show a toast notification here
+        alert(`${config.name} login is not configured yet. Please use email registration for now.`)
+      }
     } catch (error) {
       console.error(`Error signing in with ${provider}:`, error)
+      alert(`${config.name} login is not configured yet. Please use email registration for now.`)
     } finally {
       setButtonLoading(false)
       onLoading?.(false)
@@ -108,6 +114,8 @@ interface SocialLoginGroupProps {
 export function SocialLoginGroup({ className = '' }: SocialLoginGroupProps) {
   const [isLoading, setIsLoading] = useState(false)
   
+  // For now, let's just show all buttons but they won't work without env variables
+  // This provides a better user experience - they'll see what's available
   return (
     <div className={`space-y-3 ${className}`}>
       <SocialLoginButton 
