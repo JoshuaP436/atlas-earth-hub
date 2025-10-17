@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { UserAuth } from '@/components/user-auth';
 import Link from 'next/link';
 
 // Verified Atlas Earth Data
@@ -85,6 +87,7 @@ interface Strategy {
 }
 
 export default function StrategyPage() {
+  const { data: session } = useSession();
   const [budget, setBudget] = useState<number>(1000);
   const [budgetInput, setBudgetInput] = useState<string>('1000');
   const [timeHorizon, setTimeHorizon] = useState<number>(365);
@@ -94,6 +97,30 @@ export default function StrategyPage() {
   const [strategies, setStrategies] = useState<Strategy[]>([]);
   const [showComparison, setShowComparison] = useState<boolean>(false);
   const [selectedStrategies, setSelectedStrategies] = useState<number[]>([]);
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  // Load user profile data when authenticated
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchUserProfile();
+    }
+  }, [session]);
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetch('/api/user/profile');
+      if (response.ok) {
+        const profile = await response.json();
+        setUserProfile(profile);
+        // Auto-populate with user's data
+        setBudget(profile.currentAB || 1000);
+        setBudgetInput((profile.currentAB || 1000).toString());
+        setCurrentBadgeTier(profile.currentBadgeTier || 0);
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  };
 
   const formatCurrency = (amount: number) => {
     if (amount < 0.01) {
@@ -216,6 +243,7 @@ export default function StrategyPage() {
                 <Link href="/strategy" className="text-blue-600 dark:text-blue-400 font-semibold">Strategy</Link>
                 <Link href="/portfolio" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-all duration-200 hover:scale-105">Portfolio</Link>
               </nav>
+              <UserAuth />
               <ThemeToggle />
             </div>
           </div>
@@ -250,7 +278,21 @@ export default function StrategyPage() {
 
         {/* Strategy Parameters */}
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-white/20 dark:border-gray-700 mb-8">
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Investment Parameters</h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Investment Parameters</h3>
+            {session && userProfile && (
+              <div className="flex items-center space-x-2 text-sm text-green-600 dark:text-green-400">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span>Using your saved data</span>
+              </div>
+            )}
+            {session && !userProfile && (
+              <div className="flex items-center space-x-2 text-sm text-yellow-600 dark:text-yellow-400">
+                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                <span>Update your <Link href="/profile" className="underline">profile</Link> for personalized data</span>
+              </div>
+            )}
+          </div>
           
           <div className="grid md:grid-cols-4 gap-6">
             <div>

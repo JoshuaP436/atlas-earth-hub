@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { UserAuth } from '@/components/user-auth';
 import PassportBoostVisualizer from '@/components/PassportBoostVisualizer';
 
 export default function HomePage() {
@@ -31,6 +32,7 @@ export default function HomePage() {
                 <Link href="/strategy" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-all duration-200 hover:scale-105">Strategy</Link>
                 <Link href="/portfolio" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-all duration-200 hover:scale-105">Portfolio</Link>
               </nav>
+              <UserAuth />
               <ThemeToggle />
             </div>
           </div>
