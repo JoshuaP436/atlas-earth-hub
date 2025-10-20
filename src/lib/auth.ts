@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs"
 const users: Array<{ id: string; email: string; password: string; name?: string }> = []
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only",
   session: { strategy: "jwt" },
   providers: [
     CredentialsProvider({
@@ -15,15 +16,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
+        console.log('🔐 Authorization attempt:', { email: credentials?.email })
+        
         if (!credentials?.email || !credentials?.password) {
+          console.log('❌ Missing credentials')
           return null
         }
 
         // For demo - check if user exists
         const user = users.find(u => u.email === credentials.email)
+        console.log('👤 User lookup:', { found: !!user, totalUsers: users.length })
         
         if (!user) {
           // Auto-register for demo purposes
+          console.log('✨ Creating new user')
           const hashedPassword = await bcrypt.hash(credentials.password as string, 12)
           const newUser = {
             id: Date.now().toString(),
@@ -32,6 +38,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             name: (credentials.email as string)?.split('@')[0]
           }
           users.push(newUser)
+          console.log('✅ New user created:', { id: newUser.id, email: newUser.email })
           
           return {
             id: newUser.id,
@@ -47,9 +54,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         )
 
         if (!isPasswordValid) {
+          console.log('❌ Invalid password')
           return null
         }
 
+        console.log('✅ User authenticated successfully')
         return {
           id: user.id,
           email: user.email,
