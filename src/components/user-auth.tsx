@@ -71,16 +71,13 @@ export function UserAuth() {
     <div className="flex items-center space-x-2">
       <Link
         href="/auth/signin"
-        className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 text-sm font-medium transition-colors"
+        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
       >
         Sign In
       </Link>
-      <Link
-        href="/auth/signup"
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-      >
-        Sign Up
-      </Link>
+      <span className="text-xs text-gray-500 dark:text-gray-400">
+        New users auto-registered
+      </span>
     </div>
   )
 }
