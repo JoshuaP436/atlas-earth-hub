@@ -1,17 +1,17 @@
 import NextAuth from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { PrismaClient } from "@prisma/client"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
 import GitHubProvider from "next-auth/providers/github"
 import FacebookProvider from "next-auth/providers/facebook"
 import TwitterProvider from "next-auth/providers/twitter"
 import bcrypt from "bcryptjs"
+import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  // Remove Prisma adapter for now - use JWT sessions only
+  // adapter: PrismaAdapter(prisma),
   providers: [
     // Only include providers if environment variables are available
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ? [
@@ -102,28 +102,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session
     },
     async signIn({ user, account, profile }) {
-      // Auto-create user profile for social login users
-      if (account?.provider !== 'credentials' && user?.id) {
-        try {
-          const existingProfile = await prisma.userProfile.findUnique({
-            where: { userId: user.id }
-          })
-          
-          if (!existingProfile) {
-            await prisma.userProfile.create({
-              data: {
-                userId: user.id,
-                currentAB: 0,
-                totalLands: 0,
-                currentBadgeTier: 0,
-                mayor: false,
-              }
-            })
-          }
-        } catch (error) {
-          console.error('Error creating user profile:', error)
-        }
-      }
+      // For now, just allow all sign-ins
+      // We'll add proper user profile creation later with a working database
       return true
     }
   },
