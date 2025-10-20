@@ -1,47 +1,13 @@
 import NextAuth from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { PrismaClient } from "@prisma/client"
 import CredentialsProvider from "next-auth/providers/credentials"
-import GoogleProvider from "next-auth/providers/google"
-import GitHubProvider from "next-auth/providers/github"
-import FacebookProvider from "next-auth/providers/facebook"
-import TwitterProvider from "next-auth/providers/twitter"
 import bcrypt from "bcryptjs"
 
-const prisma = new PrismaClient()
+// Simple user store for demo - in production this would be your database
+const users: Array<{ id: string; email: string; password: string; name?: string }> = []
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  session: { strategy: "jwt" },
   providers: [
-    // Only include providers if environment variables are available
-    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ? [
-      GoogleProvider({
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      })
-    ] : []),
-    
-    ...(process.env.GITHUB_ID && process.env.GITHUB_SECRET ? [
-      GitHubProvider({
-        clientId: process.env.GITHUB_ID,
-        clientSecret: process.env.GITHUB_SECRET,
-      })
-    ] : []),
-    
-    ...(process.env.FACEBOOK_CLIENT_ID && process.env.FACEBOOK_CLIENT_SECRET ? [
-      FacebookProvider({
-        clientId: process.env.FACEBOOK_CLIENT_ID,
-        clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-      })
-    ] : []),
-    
-    ...(process.env.TWITTER_CLIENT_ID && process.env.TWITTER_CLIENT_SECRET ? [
-      TwitterProvider({
-        clientId: process.env.TWITTER_CLIENT_ID,
-        clientSecret: process.env.TWITTER_CLIENT_SECRET,
-      })
-    ] : []),
-    
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -49,45 +15,49 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        try {
-          if (!credentials?.email || !credentials?.password) {
-            return null
-          }
-
-          const user = await prisma.user.findUnique({
-            where: {
-              email: credentials.email as string
-            }
-          })
-
-          if (!user || !user.password) {
-            return null
-          }
-
-          const isPasswordValid = await bcrypt.compare(
-            credentials.password as string,
-            user.password
-          )
-
-          if (!isPasswordValid) {
-            return null
-          }
-
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-          }
-        } catch (error) {
-          console.error('Authentication error:', error)
+        if (!credentials?.email || !credentials?.password) {
           return null
+        }
+
+        // For demo - check if user exists
+        const user = users.find(u => u.email === credentials.email)
+        
+        if (!user) {
+          // Auto-register for demo purposes
+          const hashedPassword = await bcrypt.hash(credentials.password as string, 12)
+          const newUser = {
+            id: Date.now().toString(),
+            email: credentials.email as string,
+            password: hashedPassword,
+            name: (credentials.email as string)?.split('@')[0]
+          }
+          users.push(newUser)
+          
+          return {
+            id: newUser.id,
+            email: newUser.email,
+            name: newUser.name,
+          }
+        }
+
+        // Verify password
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password as string,
+          user.password
+        )
+
+        if (!isPasswordValid) {
+          return null
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
         }
       }
     })
   ],
-  session: {
-    strategy: "jwt"
-  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -100,31 +70,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id as string
       }
       return session
-    },
-    async signIn({ user, account, profile }) {
-      // Auto-create user profile for social login users
-      if (account?.provider !== 'credentials' && user?.id) {
-        try {
-          const existingProfile = await prisma.userProfile.findUnique({
-            where: { userId: user.id }
-          })
-          
-          if (!existingProfile) {
-            await prisma.userProfile.create({
-              data: {
-                userId: user.id,
-                currentAB: 0,
-                totalLands: 0,
-                currentBadgeTier: 0,
-                mayor: false,
-              }
-            })
-          }
-        } catch (error) {
-          console.error('Error creating user profile:', error)
-        }
-      }
-      return true
     }
   },
   pages: {
