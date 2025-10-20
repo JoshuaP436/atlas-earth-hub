@@ -31,6 +31,7 @@ export default function HomePage() {
                 <Link href="/calculator" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-all duration-200 hover:scale-105">Calculator</Link>
                 <Link href="/strategy" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-all duration-200 hover:scale-105">Strategy</Link>
                 <Link href="/portfolio" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-all duration-200 hover:scale-105">Portfolio</Link>
+                <Link href="/analytics" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-all duration-200 hover:scale-105">Analytics</Link>
               </nav>
               <UserAuth />
               <ThemeToggle />
@@ -120,7 +121,7 @@ export default function HomePage() {
           </div>
 
           {/* Feature Cards Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <Link href="/calculator" className="group">
               <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-white/20 dark:border-gray-700 hover:scale-105 transition-all duration-300 h-full">
                 <div className="flex items-center gap-4 mb-6">
@@ -174,6 +175,25 @@ export default function HomePage() {
                 </p>
                 <div className="flex items-center text-green-600 dark:text-green-400 font-semibold group-hover:translate-x-2 transition-transform duration-300">
                   Track Portfolio <span className="ml-2">→</span>
+                </div>
+              </div>
+            </Link>
+
+            <Link href="/analytics" className="group">
+              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-white/20 dark:border-gray-700 hover:scale-105 transition-all duration-300 h-full">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="p-3 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-xl font-bold text-gray-900 dark:text-white">Analytics Dashboard</h4>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Advanced analytics with earnings trends, performance charts, and data-driven insights for strategic optimization.
+                </p>
+                <div className="flex items-center text-orange-600 dark:text-orange-400 font-semibold group-hover:translate-x-2 transition-transform duration-300">
+                  View Analytics <span className="ml-2">→</span>
                 </div>
               </div>
             </Link>
